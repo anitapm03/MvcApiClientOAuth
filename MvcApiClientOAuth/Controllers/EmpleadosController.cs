@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MvcApiClientOAuth.Filters;
 using MvcApiClientOAuth.Models;
 using MvcApiClientOAuth.Services;
 
@@ -11,7 +12,7 @@ namespace MvcApiClientOAuth.Controllers
         {
             this.service = service;
         }
-
+        [AuthorizeEmpleados]
         public async Task<IActionResult> Index()
         {
             List<Empleado> empleados = await

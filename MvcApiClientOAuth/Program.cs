@@ -1,8 +1,9 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using MvcApiClientOAuth.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddTransient<ServiceEmpleados>();
 builder.Services.AddDistributedMemoryCache(); 
 builder.Services.AddSession(options =>
@@ -10,7 +11,19 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 
-builder.Services.AddControllersWithViews();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme =
+    CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme =
+    CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme =
+    CookieAuthenticationDefaults.AuthenticationScheme;
+}).AddCookie();
+
+builder.Services.AddControllersWithViews
+    (options => options.EnableEndpointRouting = false);
 
 var app = builder.Build();
 
