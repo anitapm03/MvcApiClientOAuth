@@ -33,26 +33,45 @@ namespace MvcApiClientOAuth.Controllers
         [AuthorizeEmpleados]
         public async Task<IActionResult> Perfil()
         {
-            var data =
-                HttpContext.User.FindFirst
-                (x => x.Type == ClaimTypes.NameIdentifier).Value;
-            int id = int.Parse(data);
+            
             Empleado emp = await
-                this.service.FindEmpleadoAsync(id);
+                this.service.GetPerfilAsync();
             return View(emp);
         }
 
         [AuthorizeEmpleados]
         public async Task<IActionResult> CompisCurro()
         {
-            //necesito el id delp
-            var data =
-                HttpContext.User.FindFirst
-                (x => x.Type == "IDDEPARTAMENTO").Value;
-            int idDept = int.Parse(data);
-            Empleado emp = await
-                this.service.FindCompisAsync(id);
-            return View(emp);
+            
+            List<Empleado> emps = await
+                this.service.GetCompisAsync();
+            return View(emps);
+        }
+
+        public async Task<IActionResult> EmpleadosOficio()
+        {
+            List<string> oficios = await
+                this.service.GetOficiosAsync();
+            ViewData["OF"] = oficios;
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EmpleadosOficio
+            (int? incremento, List<string> oficio,string accion)
+        {
+            List<string> oficios = await
+               this.service.GetOficiosAsync();
+            ViewData["OF"] = oficios;
+
+            if(accion.ToLower() == "update")
+            {
+                await this.service.SubirSalarioAsync(incremento.Value, oficio);
+            }
+            List<Empleado> empleados = await
+                this.service.GetEmpleadosOficioAsync(oficio);
+
+            return View(empleados);
         }
     }
 }

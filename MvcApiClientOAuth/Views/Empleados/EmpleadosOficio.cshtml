@@ -1,0 +1,51 @@
+﻿@model List<Empleado>
+@{
+    List<string> oficios = ViewData["OF"] as List<string>;
+}
+
+<h1>Buscar por oficio y subir salarios</h1>
+
+<form method="post">
+
+    <label>Elige oficio</label>
+    <select name="oficio" size="5" multiple
+        class="form-control">
+        @foreach (string of in oficios)
+        {
+            <option value="@of">@of</option>
+        }
+    </select>
+    <br />
+    <label>Incremento salarial</label>
+    <input type="number" name="incremento" class="form-control"/>
+    <br />
+    <button class="btn btn-success" name="accion" value="read"
+    >Buscar</button>
+    <button class="btn btn-danger" name="accion" value="update"
+    >Incrementar</button>
+</form>
+
+@if (Model != null)
+{
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>apellido</th>
+                <th>oficio</th>
+                <th>salario</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Empleado e in Model)
+            {
+                <tr>
+                    <td>@e.Apellido</td>
+                    <td>@e.Oficio</td>
+                    <td>@e.Salario</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+

@@ -128,5 +128,79 @@ namespace MvcApiClientOAuth.Services
                 this.CallApiAsync<Empleado>(request, token);
             return empleado;
         }
+
+        public async Task<Empleado> GetPerfilAsync()
+        {
+            string token =
+                this.httpContextAccessor.HttpContext.User
+                .FindFirst(x => x.Type == "TOKEN").Value;
+
+            string request = "api/empleados/perfilempleado";
+            Empleado empleado = await
+                this.CallApiAsync<Empleado>(request, token);
+            return empleado;
+        }
+
+        public async Task<List<Empleado>> GetCompisAsync()
+        {
+            string token =
+                this.httpContextAccessor.HttpContext.User
+                .FindFirst(x => x.Type == "TOKEN").Value;
+
+            string request = "api/empleados/getcompisempleado";
+
+            List<Empleado> compis = await this.CallApiAsync
+                <List<Empleado>>(request, token);
+            return compis;
+        }
+
+        public async Task<List<string>> GetOficiosAsync()
+        {
+            string request = "api/empleados/oficios";
+            List<string> oficios = await
+                this.CallApiAsync<List<string>>(request);
+            return oficios;
+        }
+
+        private string TransformCollectionToQuery
+            (List<string> collection)
+        {
+            string result = "";
+            foreach (string elem in collection)
+            {
+                result += "oficio=" + elem + "&";
+            }
+            result = result.TrimEnd('&');
+            return result;
+        }
+
+        public async Task<List<Empleado>>
+            GetEmpleadosOficioAsync(List<string> oficios)
+        {
+            string request = "api/empleados/empleadosoficio";
+            string data = this.TransformCollectionToQuery(oficios);
+            List<Empleado> empleados = await
+                this.CallApiAsync<List<Empleado>>(request + "?" + data);
+            return empleados;
+        }
+
+        public async Task SubirSalarioAsync
+            (int incremento, List<string> oficios)
+        {
+            string request = 
+                "api/empleados/subirsalariooficio/" + incremento;
+
+            string data = this.TransformCollectionToQuery(oficios);
+            
+            using(HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(this.UrlApiEmpleados);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(this.Header);
+                HttpResponseMessage response =
+                    await client.PutAsync(request+"?"+data,null);
+
+            }
+        }
     }
 }
