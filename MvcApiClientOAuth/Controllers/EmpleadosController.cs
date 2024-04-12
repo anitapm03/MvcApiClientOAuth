@@ -2,6 +2,7 @@
 using MvcApiClientOAuth.Filters;
 using MvcApiClientOAuth.Models;
 using MvcApiClientOAuth.Services;
+using System.Security.Claims;
 
 namespace MvcApiClientOAuth.Controllers
 {
@@ -20,21 +21,38 @@ namespace MvcApiClientOAuth.Controllers
             return View(empleados);
         }
 
+        [AuthorizeEmpleados]
         public async Task<IActionResult> Details
             (int id)
         {
-            string token = HttpContext.Session.GetString("TOKEN");
-            if(token == null)
-            {
-                ViewData["MSG"] = "Validate";
-                return View();
-            }
-            else
-            {
-                Empleado emp = await
-                this.service.FindEmpleadoAsync(id, token);
-                return View(emp);
-            }
+            Empleado emp = await
+                this.service.FindEmpleadoAsync(id);
+            return View(emp);
+        }
+
+        [AuthorizeEmpleados]
+        public async Task<IActionResult> Perfil()
+        {
+            var data =
+                HttpContext.User.FindFirst
+                (x => x.Type == ClaimTypes.NameIdentifier).Value;
+            int id = int.Parse(data);
+            Empleado emp = await
+                this.service.FindEmpleadoAsync(id);
+            return View(emp);
+        }
+
+        [AuthorizeEmpleados]
+        public async Task<IActionResult> CompisCurro()
+        {
+            //necesito el id delp
+            var data =
+                HttpContext.User.FindFirst
+                (x => x.Type == "IDDEPARTAMENTO").Value;
+            int idDept = int.Parse(data);
+            Empleado emp = await
+                this.service.FindCompisAsync(id);
+            return View(emp);
         }
     }
 }

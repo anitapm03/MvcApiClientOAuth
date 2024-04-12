@@ -43,7 +43,10 @@ namespace MvcApiClientOAuth.Controllers
                     (ClaimTypes.Name, model.UserName));
                 //almacenamos el id del usuario
                 identity.AddClaim(new Claim
+
+                    //hacemos un claim para el eoken
                     (ClaimTypes.NameIdentifier, model.Password));
+                identity.AddClaim(new Claim("TOKEN", token));
 
                 ClaimsPrincipal userPrincipal =
                     new ClaimsPrincipal(identity);

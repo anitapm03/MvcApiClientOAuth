@@ -11,12 +11,18 @@ namespace MvcApiClientOAuth.Services
     {
         private string UrlApiEmpleados;
         private MediaTypeWithQualityHeaderValue Header;
-        public ServiceEmpleados(IConfiguration configuration)
+
+        //obj para recuperar httpcontext y user y su claim
+        private IHttpContextAccessor httpContextAccessor;
+
+        public ServiceEmpleados(IConfiguration configuration,
+            IHttpContextAccessor httpContextAccessor)
         {
             this.UrlApiEmpleados =
                 configuration.GetValue<string>("ApiUrls:ApiEmpleados");
             this.Header =
                 new MediaTypeWithQualityHeaderValue("application/json");
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<string> GetTokenAsync
@@ -111,11 +117,15 @@ namespace MvcApiClientOAuth.Services
         }
 
         public async Task<Empleado> FindEmpleadoAsync
-            (int id, string token)
+            (int id)
         {
+            string token =
+                this.httpContextAccessor.HttpContext.User
+                .FindFirst(x => x.Type == "TOKEN").Value;
+
             string request = "api/empleados/" + id;
             Empleado empleado = await
-                this.CallApiAsync<Empleado>(request);
+                this.CallApiAsync<Empleado>(request, token);
             return empleado;
         }
     }
